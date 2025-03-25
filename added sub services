@@ -1,0 +1,160 @@
+"use client";
+
+import { useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { Plus, Minus } from "lucide-react";
+
+interface ServiceField {
+  serviceName: string;
+  subCategory: string;
+  subServiceName?: string;
+}
+
+const serviceOptions = ["Property Maintenance", "Cleaning Services", "Pest control & Disinfection Services", "Home Laundry Service"];
+const subCategoryOptions = ["yes", "no"];
+
+const GeneralInfoForm = () => {
+  const { register, control, handleSubmit } = useForm({
+    defaultValues: {
+      services: [{ serviceName: "", subCategory: "", subServiceName: "" }],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "services",
+  });
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    if (event.dataTransfer.files && event.dataTransfer.files[0]) {
+      setSelectedFile(event.dataTransfer.files[0]);
+    }
+  };
+
+  return (
+    <div className="w-[70.5rem] rounded-[0.75rem] p-[1.5rem] bg-white shadow-lg flex flex-col gap-[0.875rem]">
+      <h2 className="text-lg font-semibold">General Information</h2>
+      
+      <div
+        className="border-dashed border-2 border-gray-300 rounded-lg p-5 flex items-center justify-between cursor-pointer"
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        onClick={() => document.getElementById("fileInput")?.click()}
+      >
+        <input
+          type="file"
+          id="fileInput"
+          className="hidden"
+          accept="image/svg+xml"
+          onChange={handleFileChange}
+        />
+        <div className="flex items-center gap-2">
+          <span className="text-gray-500">📷</span>
+          <span className="text-gray-400">
+            {selectedFile ? selectedFile.name : "Drag and drop image here, or click add image(svg)"}
+          </span>
+        </div>
+        <button
+          className="bg-purple-200 text-purple-700 px-4 py-2 rounded-lg"
+          onClick={() => document.getElementById("fileInput")?.click()}
+        >
+          Upload
+        </button>
+      </div>
+      
+      {fields.map((field, index) => (
+        <div key={field.id} className="flex flex-col gap-4">
+          <div className="flex justify-between gap-4 items-center">
+            <div className="w-[45%]">
+              <label className="block text-gray-700">Service Name</label>
+              <select
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                {...register(`services.${index}.serviceName`)}
+              >
+                <option value="">Select Service</option>
+                {serviceOptions.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </div>
+            <div className="w-[45%]">
+              <label className="block text-gray-700">Sub Category</label>
+              <select
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                {...register(`services.${index}.subCategory`)}
+              >
+                <option value="">Select Sub Category</option>
+                {subCategoryOptions.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="w-full rounded-lg p-5 bg-white shadow-lg flex flex-col gap-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-md font-semibold">Sub Service</h3>
+              <div className="flex gap-2">
+                <button className="bg-purple-200 p-2 rounded-lg" onClick={() => remove(index)}>
+                  <Minus className="w-4 h-4 text-purple-700" />
+                </button>
+                <button className="bg-purple-200 p-2 rounded-lg" onClick={() => append({ serviceName: "", subCategory: "", subServiceName: "" })}>
+                  <Plus className="w-4 h-4 text-purple-700" />
+                </button>
+              </div>
+            </div>
+            <div
+              className="border-dashed border-2 border-gray-300 rounded-lg p-5 flex items-center justify-between cursor-pointer"
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+              onClick={() => document.getElementById("subFileInput")?.click()}
+            >
+              <input
+                type="file"
+                id="subFileInput"
+                className="hidden"
+                accept="image/png, image/jpeg"
+                onChange={handleFileChange}
+              />
+              <div className="flex items-center gap-2">
+                <span className="text-gray-500">📷</span>
+                <span className="text-gray-400">
+                  {selectedFile ? selectedFile.name : "Drag and drop image here, or click add image(jpg,png)"}
+                </span>
+              </div>
+              <button
+                className="bg-purple-200 text-purple-700 px-4 py-2 rounded-lg"
+                onClick={() => document.getElementById("subFileInput")?.click()}
+              >
+                Upload
+              </button>
+            </div>
+            <div className="w-full">
+              <label className="block text-gray-700">Service</label>
+              <input
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                {...register(`services.${index}.subServiceName`)}
+                placeholder="Service Name"
+              />
+            </div>
+        </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default GeneralInfoForm;
