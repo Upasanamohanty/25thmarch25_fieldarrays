@@ -1,0 +1,67 @@
+"use client";
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Plus, Minus, Image } from "lucide-react";
+
+const SubServiceForm: React.FC = () => {
+  const [services, setServices] = useState([{ id: 1, name: "" }]);
+
+  const addService = () => {
+    setServices([...services, { id: Date.now(), name: "" }]);
+  };
+
+  const removeService = (id: number) => {
+    setServices(services.filter((service) => service.id !== id));
+  };
+
+  const handleChange = (id: number, value: string) => {
+    setServices(
+      services.map((service) =>
+        service.id === id ? { ...service, name: value } : service
+      )
+    );
+  };
+
+  return (
+    <div className="w-[70vw] rounded-[12vw] bg-white shadow-lg p-[1.5rem] flex flex-col space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold">Sub Service</h3>
+        <button
+          className="w-6 h-6 bg-purple-500 rounded flex items-center justify-center text-white"
+          onClick={addService}
+        >
+          <Plus size={16} />
+        </button>
+      </div>
+      {services.map((service, index) => (
+        <div key={service.id} className="flex flex-col space-y-2 border p-[0.75rem] rounded-md">
+          <div className="border-dashed border-2 border-gray-300 rounded-lg flex items-center justify-center h-[8rem] text-gray-400 cursor-pointer">
+            <Image size={24} className="mr-2" />
+            Drag and drop image here, or click add image(jpg, png)
+          </div>
+          <Button className="bg-purple-500 text-white w-full max-w-[7.5rem]">Upload</Button>
+          <div>
+            <label className="text-gray-600 text-sm">Service</label>
+            <input
+              type="text"
+              placeholder="Service Name"
+              value={service.name}
+              onChange={(e) => handleChange(service.id, e.target.value)}
+              className="w-full border rounded p-[0.5rem] mt-[0.25rem]"
+            />
+          </div>
+          {services.length > 1 && (
+            <button
+              className="w-6 h-6 bg-red-500 text-white rounded flex items-center justify-center"
+              onClick={() => removeService(service.id)}
+            >
+              <Minus size={16} />
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default SubServiceForm;
